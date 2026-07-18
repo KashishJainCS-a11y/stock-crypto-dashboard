@@ -48,6 +48,9 @@ class DataFetcher:
                 logger.warning(f"No data found for {symbol}")
                 return None
             
+            if isinstance(data.columns, pd.MultiIndex):
+                data.columns = data.columns.get_level_values(0)
+            
             logger.info(f"Fetched {len(data)} rows for {symbol}")
             return data
         
@@ -91,6 +94,9 @@ class DataFetcher:
             if data.empty:
                 logger.warning(f"No data found for {symbol}")
                 return None
+            
+            if isinstance(data.columns, pd.MultiIndex):
+                data.columns = data.columns.get_level_values(0)
             
             logger.info(f"Fetched {len(data)} rows for {symbol}")
             return data
@@ -144,6 +150,9 @@ class DataFetcher:
             data = yf.download(symbol, period="1d", progress=False)
             if data.empty:
                 return None
+            
+            if isinstance(data.columns, pd.MultiIndex):
+                data.columns = data.columns.get_level_values(0)
             
             return float(data['Close'].iloc[-1])
         
