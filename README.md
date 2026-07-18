@@ -1,7 +1,7 @@
 # 📈 Live Stock & Crypto Dashboard
 
 A real-time data analytics and visualization platform for monitoring stock market and cryptocurrency prices with advanced analytics and trading signals.
-
+Live demo: https://stock-crypto-dashboard.streamlit.app/
 ## 🎯 Features
 
 ### Phase 1 (MVP)
