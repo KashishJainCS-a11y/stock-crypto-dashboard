@@ -8,6 +8,28 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+_OHLCV_NAMES = {'Open', 'High', 'Low', 'Close', 'Adj Close', 'Volume'}
+
+
+def _flatten_columns(data: pd.DataFrame) -> pd.DataFrame:
+    """
+    Normalize yfinance output to plain single-level OHLCV columns.
+    Handles both possible MultiIndex orderings (Price/Ticker or Ticker/Price)
+    and de-duplicates any resulting duplicate column labels.
+    """
+    if isinstance(data.columns, pd.MultiIndex):
+        level0 = set(data.columns.get_level_values(0))
+        if _OHLCV_NAMES & level0:
+            data.columns = data.columns.get_level_values(0)
+        else:
+            data.columns = data.columns.get_level_values(-1)
+    
+    # Guard against any duplicate column labels (keep first occurrence)
+    if data.columns.duplicated().any():
+        data = data.loc[:, ~data.columns.duplicated()]
+    
+    return data
+
 class DataFetcher:
     """Fetch stock and crypto data from various sources"""
     
@@ -48,8 +70,7 @@ class DataFetcher:
                 logger.warning(f"No data found for {symbol}")
                 return None
             
-            if isinstance(data.columns, pd.MultiIndex):
-                data.columns = data.columns.get_level_values(0)
+            data = _flatten_columns(data)
             
             logger.info(f"Fetched {len(data)} rows for {symbol}")
             return data
@@ -95,8 +116,7 @@ class DataFetcher:
                 logger.warning(f"No data found for {symbol}")
                 return None
             
-            if isinstance(data.columns, pd.MultiIndex):
-                data.columns = data.columns.get_level_values(0)
+            data = _flatten_columns(data)
             
             logger.info(f"Fetched {len(data)} rows for {symbol}")
             return data
@@ -151,8 +171,7 @@ class DataFetcher:
             if data.empty:
                 return None
             
-            if isinstance(data.columns, pd.MultiIndex):
-                data.columns = data.columns.get_level_values(0)
+            data = _flatten_columns(data)
             
             return float(data['Close'].iloc[-1])
         

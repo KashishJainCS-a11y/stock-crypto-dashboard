@@ -149,6 +149,8 @@ def main():
     except Exception as e:
         st.error(f"Error: {str(e)}")
         st.info("Please try refreshing the data or selecting a different symbol.")
+        import traceback
+        st.code(traceback.format_exc())
 
 if __name__ == "__main__":
     main()
